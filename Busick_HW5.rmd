@@ -1,0 +1,46 @@
+---
+title: "Is the Use of COMPAS Software Permissible in U.S. Parole Hearings? Intersection of Ethics and Statistics"
+author: "Hunter Busick"
+date: "11/8/2024"
+output:
+  pdf_document: default
+  html_document:
+    number_sections: true
+---
+## Overview
+
+Before any judge is granted the keys to their chambers they must recite the United States Judicial Oath. In this oath, a soon-to-be judge solemnly swears to administer justice without respect to persons and to do equal justice for both the poor and the rich. While this oath is short and concise, it serves as a gateway for further discussion of what we expect out of our appointed and elected judiciary officials. In addition to the wealth status of a person, there are many additional variables we think should not play a biased role in a judge’s decision such as race, gender, and religion. While this is a good start for determining the set of rules judges follow when making decisions, we must also not forget that every single judge whether appointed or elected will have their innate biases that arise simply from being human. A judge who grew up in the South will have a different set of biases than one who was raised in the Pacific Northwest. It is important to note that Judges are not the only people subject to letting their biases slip into the workplace. Statisticians, computer scientists, and data scientists may also fall victim.
+
+While countless hours go into evaluating the outcomes and potential biases of models like COMPAS, it is important to remember that there are often entire teams behind the method that goes into a model. Each member of this team has their own set of biases that are liable to slip into their work. It is for this reason that I would argue against the use of COMPAS classification software in determining whether a convict will be a recidivist. COMPAS software was developed in the late 1990’s by Tim Brennan and Dave Wells, a statistics professor and corrections specialist respectively. These two would go onto form Northpointe Inc., a company for their software developments. Since its initial use in Wisconsin in 2012, the algorithm has evaluated over 1 million convicts^[https://stanfordrewired.com/post/data-and-discretion]. The use of COMPAS software in this fashion has come with a great deal of controversy, as scholars of the judiciary and statistics alike seek to justify or invalidate its use in the courts. This report will evaluate both the philosophical and statistical justifications for not utilizing the COMPAS algorithm.
+
+## Ethical Concerns
+
+When we think about the role of a judge, we can imagine someone who is trying to optimize a specific set of conditions presented in the case. In the instance of convictions, they are applying the optimal sentence such that the defendant receives punishment that is deemed worthy while not being cruel or unusual. In our case of parole hearings, our judge is optimizing societal gain. Moreso, they are deciding between granting parole to a certain convict in the hopes they do not re-offend (societal gain) vs. granting parole only for the convict to become a recidivist (societal loss). It is rational to believe that courts should act in a way that places the better option for the public at the top. This belief mostly aligns with our consequentialist ethical framework. Given that we would like our judges to operate in a consequentialist state of mind, what would this framework say about implementing COMPAS software into parole hearings? The consequentialist would argue that the decision to implement COMPAS into parole hearings would solely hinge on whether the algorithm can predict recidivism at a better rate than a judge or help a judge better their decision outcomes. We will explore the accuracy of COMPAS in our statistical analysis, however, this isn’t a very fulfilling answer. What might other frameworks suggest?
+
+Father of deontology Immanuel Kant defined the categorical imperative as the rules that must be followed without exception. While some would say that the candidate has violated the categorical imperative by being convicted of a crime in the first place, the entire point of the parole system is that we are able to offer a second chance. The deontologist would argue that an act shall only be permissible if it can be universalized without logical contradiction. What does universalizing a classification algorithm to parole hearings look like? To say the logistics of implementing COMPAS equally into every parole hearing across the United States would be difficult is an understatement. Additionally, it is fair to assume that we would continuously seek to improve the algorithm using last year’s data from real hearings. Does this not then create a perpetual cycle of treating persons as means-to-an-end, as next year’s candidates would face a model more accurate than the current one?
+
+## Statistical Concerns
+
+The following confusion matrices are from researchers at ProPublica^[https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm] where 0 represents am individual deemed "low-risk" and 1 deemed as "high-risk", separated by race.
+```{r echo=FALSE, message=FALSE, results='asis'}
+library(tibble)
+library(knitr)
+
+blk_cm <- tibble(Actual = c("0", "1"),
+  `Predicted 0` = c(990, 805),
+  `Predicted 1` = c(532, 1369))
+
+wht_cm <- tibble(Actual = c("0", "1"),
+  `Predicted 0` = c(1139, 349),
+  `Predicted 1` = c(461, 505))
+
+kable(blk_cm, align = "c", caption = "Black Candidates Confusion Matrix")
+kable(wht_cm, align = "c", caption = "White Candidates Confusion Matrix")
+```
+While these results may seem initially suspicious, we can perform further analysis to prove there are discrepancies at play. *Equalized odds* is a statistical measure of fairness that ensures an algorithm is performing similarly on different groups. In running this analysis on the false positive rate we receive a value of *.218* which is greater than the industry accepted value of *$\epsilon = .2$*, indicating we are receiving different false positives between the black and white race groups. Additionally we can perform a *disparate impact* analysis which represents whether members of a class are realizing differing outcomes. Performing this analysis on the above matrices returns a value of *.592* which is less than the accepted *$1-\epsilon$* or in our case *.8*, thus violating disparate impact. Finally we can perform a *statistical parody* analysis in which we recieve a value of *.24* which is once again greater than *.2*, thus a third violation. It is important to note that the *impossibility theorem*^[S, Kailash. (2020). The Impossibility Theorem of Machine Fairness – A Causal Perspective.
+10.48550/arXiv.2007.06024] highlights that no single algorithm will be able to satisfy all statistical measures of fairness unless it is a certain fringe case, however our measures with the given sample were unable to satisfy just one of the statistical measures of fairness. It is important to keep in mind that this is a small sample compared the million plus cases COMPAS has evaluated, and that further research for a matter of this magnitude is encouraged. It is then my recommendation, based on both moral and statistical measures of fairness, that you do not incorporate COMPAS software into your courtroom when deciding on parole hearings.
+
+
+
+
+
